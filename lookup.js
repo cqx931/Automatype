@@ -30,7 +30,7 @@ function Automatype(wordCompleteCallback) {
     if (this.showSelectionRect) {
       noStroke();
       fill(0, 0, 200, 32);
-      rect(this.offset() + 4, height/2 - this.height/2 + 10,
+      rect(this.offset() - this.width, height/2 - this.height/2 + 10,
         this.width, this.height);
       fill(0,0,0);
     }
@@ -41,14 +41,13 @@ function Automatype(wordCompleteCallback) {
       typer.pickNextTarget();
       typer.findNextEdit();
     }
-
     if (this.nextPos < this.cursor) {
       this.cursor--; // move left
       this.showSelectionRect = false;
     } else if (this.nextPos > this.cursor) {
       this.cursor++; // move right
       this.showSelectionRect = false;
-    } else if (!this.readyForReplace) {
+    } else if (!this.readyForReplace && this.nextAction === REPLACE_ACTION) {
       this.readyForReplace = true;
       this.showSelectionRect = true;
     } else {
@@ -79,17 +78,17 @@ function Automatype(wordCompleteCallback) {
       case INSERT_ACTION:
         this.word = this.word.substring(0, this.cursor) +
           this.nextChar + this.word.substring(this.cursor);
+        this.cursor++;
         break;
       default:  // REPLACE
         this.word = this.word.substring(0, this.cursor - 1) +
           this.nextChar + this.word.substring(this.cursor);
-        this.cursor++;
     }
   };
 
   this.offset = function() {
 
-    return width/2 - textWidth(this.word)/2 + ((this.cursor-1) * this.width);
+    return width/2 - textWidth(this.word)/2 + (this.cursor * this.width);
   };
 
   this.pickNextTarget = function() {
